@@ -1,3 +1,5 @@
+print("itemNames.lua loaded")
+
 local ItemNames = {
     "None",
     "Master Ball",

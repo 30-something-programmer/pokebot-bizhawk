@@ -1,7 +1,8 @@
 -- Source: https://github.com/mkdasher/PokemonBizhawkLua/blob/master/pkmgen3/Memory.lua
 
-Memory = {}
+print("memory.lua loaded")
 
+Memory = {}
 function Memory.read(addr, size)
 	mem = ""
 	memdomain = addr >> 24

@@ -1,5 +1,7 @@
 -- Source: https://github.com/mkdasher/PokemonBizhawkLua/blob/master/pkmgen3/GameSettings.lua
 
+print("gameSettings.lua Loaded")
+
 GameSettings = {
 	game = 0,
 	gamename = "",
