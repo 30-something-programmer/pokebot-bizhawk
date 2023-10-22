@@ -1,14 +1,9 @@
-import json
-import logging
-import os
-
-
 def ModeGroudon(self):
     trainer = self.GetTrainer()
     if (not self.PlayerOnMap(self.MapDataEnum.TERRA_CAVE_A.value) or
             not 11 <= trainer["posX"] <= 20 and 26 <= trainer["posY"] <= 27):
         self.logger.info("Please place the player below Groudon in Terra Cave and restart the script.")
-        os._exit(1)
+        self.os._exit(1)
 
     while True:
         self.FollowPath([(17, 26)])
@@ -36,7 +31,7 @@ def ModeKyogre(self):
     if (not self.PlayerOnMap(self.MapDataEnum.MARINE_CAVE_A.value) or
             not 5 <= trainer["posX"] <= 14 and 26 <= trainer["posY"] <= 27):
         self.logger.info("Please place the player below Kyogre in Marine Cave and restart the script.")
-        os._exit(1)
+        self.os._exit(1)
 
     while True:
         self.FollowPath([(9, 26)])
@@ -66,7 +61,7 @@ def ModeRayquaza(self):
     if (not self.PlayerOnMap(self.MapDataEnum.SKY_PILLAR_G.value) or
             not (trainer["posX"] == 14 and trainer["posY"] <= 12)):
         self.logger.info("Please place the player below Rayquaza at the Sky Pillar and restart the script.")
-        os._exit(1)
+        self.os._exit(1)
 
     while True:
         while not self.OpponentChanged():
@@ -100,7 +95,7 @@ def ModeMew(self):
     if (not self.PlayerOnMap(self.MapDataEnum.FARAWAY_ISLAND.value) or not (
             22 <= trainer["posX"] <= 23 and 8 <= trainer["posY"] <= 10)):
         self.logger.info("Please place the player below the entrance to Mew's area, then restart the script.")
-        os._exit(1)
+        self.os._exit(1)
         return
 
     while True:
@@ -145,7 +140,7 @@ def ModeRegis(self):
             not self.PlayerOnMap(self.MapDataEnum.ANCIENT_TOMB.value)):
         self.logger.info("Please place the player below the target Regi in Desert Ruins, Island Cave or Ancient Tomb, "
                  "then restart the script.")
-        os._exit(1)
+        self.os._exit(1)
 
     while True:
         while not self.OpponentChanged():
@@ -169,7 +164,7 @@ def ModeSouthernIsland(self):
     if (not self.PlayerOnMap(self.MapDataEnum.SOUTHERN_ISLAND_A.value) or
             not 5 <= trainer["posX"] == 13 and trainer["posY"] >= 12):
         self.logger.info("Please place the player below the sphere on Southern Island and restart the script.")
-        os._exit(1)
+        self.os._exit(1)
 
     while True:
         while not self.OpponentChanged():
@@ -199,7 +194,7 @@ def ModeDeoxysPuzzle(self,do_encounter: bool = True):
     if not self.PlayerOnMap(self.MapDataEnum.BIRTH_ISLAND.value) or self.GetTrainer()["posX"] != 15:
         self.logger.info("Please place the player below the triangle at its starting position on Birth Island, then save before"
                  " restarting the script.")
-        os._exit(1)
+        self.os._exit(1)
 
     delay = 4
 
@@ -285,7 +280,7 @@ def ModeDeoxysResets(self):
     if not self.PlayerOnMap(self.MapDataEnum.BIRTH_ISLAND.value) or self.GetTrainer()["posX"] != 15:
         self.logger.info("Please place the player below the triangle at its final position on Birth Island, then save before "
                  "restarting the script.")
-        os._exit(1)
+        self.os._exit(1)
 
     deoxys_frames = self.GetRNGState(self.GetTrainer()["tid"], "deoxys")
 
@@ -300,7 +295,7 @@ def ModeDeoxysResets(self):
         if not self.PlayerOnMap(self.MapDataEnum.BIRTH_ISLAND.value) or self.GetTrainer()["posX"] != 15:
             self.logger.info("Please place the player below the triangle at its final position on Birth Island, then save "
                      "before restarting the script.")
-            os._exit(1)
+            self.os._exit(1)
 
         while True:
             emu = self.GetEmu()
@@ -311,8 +306,8 @@ def ModeDeoxysResets(self):
                     self.ButtonCombo(["A", 8])
 
                 deoxys_frames["rngState"].append(emu["rngState"])
-                self.WriteFile(f"stats/{self.GetTrainer()['tid']}/deoxys.json",
-                          json.dumps(deoxys_frames, indent=4, sort_keys=True))
+                self.WriteFile(f"{self.stats_folder}/{self.GetTrainer()['tid']}/deoxys.json",
+                          self.json.dumps(deoxys_frames, indent=4, sort_keys=True))
                 self.EncounterPokemon()
             break
         continue
@@ -321,7 +316,7 @@ def ModeDeoxysResets(self):
 def ModeHoOh(self):
     if not self.PlayerOnMap(self.MapDataEnum.NAVEL_ROCK_I.value) and self.GetTrainer()["posX"] == 12:
         self.logger.info("Please place the player on the steps in front of Ho-oh at Navel Rock and restart the script.")
-        os._exit(1)
+        self.os._exit(1)
 
     while True:
         while not self.OpponentChanged():
@@ -351,7 +346,7 @@ def ModeLugia(self):
     trainer = self.GetTrainer()
     if not self.PlayerOnMap(self.MapDataEnum.NAVEL_ROCK_U.value) and trainer["posX"] == 11:
         self.logger.info("Please place the player on the steps in front of Lugia at Navel Rock and restart the script.")
-        os._exit(1)
+        self.os._exit(1)
 
     while True:
         while not self.OpponentChanged():

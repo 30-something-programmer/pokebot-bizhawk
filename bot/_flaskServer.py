@@ -1,27 +1,12 @@
 
-import cv2
-
-import logging
-
-import flask
-from flask import Flask, abort, jsonify, make_response, url_for, redirect, request
-from flask_cors import CORS
-
-from mmf.emu import GetEmu
-from mmf.pokemon import GetParty
-from mmf.screenshot import GetScreenshot
-from mmf.trainer import GetTrainer
-from mmf.bag import GetBag
-
-
 def httpServer(self):
     """Run Flask server to make bot data available via HTTP GET"""
+    import flask
+    from flask import Flask, abort, jsonify, make_response, url_for, redirect, request
     try:
-        log = logging.getLogger("werkzeug")
-        log.setLevel(logging.ERROR)
-
-        server = Flask(__name__, static_folder="./interface")
-        CORS(server)
+        self.logger.info("Running HTTP server")
+        server = Flask(__name__, static_folder=self.interface_folder)
+        self.CORS(server)
 
         @server.route("/")
         def Root():
@@ -41,27 +26,27 @@ def httpServer(self):
 
         @server.route("/trainer", methods=["GET"])
         def Trainer():
-            trainer = GetTrainer()
+            trainer = self.GetTrainer()
             if trainer:
                 return jsonify(trainer)
-            abort(503)
+            self.abort(503)
 
         @server.route("/bag", methods=["GET"])
         def Bag():
-            bag = GetBag()
+            bag = self.GetBag()
             if bag:
                 return jsonify(bag)
-            abort(503)
+            self.abort(503)
 
         @server.route("/party", methods=["GET"])
         def Party():
-            party = GetParty()
+            party = self.GetParty()
             if party:
                 return jsonify(party)
-            abort(503)
+            self.abort(503)
 
         @server.route("/encounter", methods=["GET"])
-        def Encounter(self):
+        def Encounter():
             encounter_logs = self.GetEncounterLog()["encounter_log"]
             if len(encounter_logs) > 0 and encounter_logs[-1]["pokemon_obj"]:
                 encounter = encounter_logs.pop()["pokemon_obj"]
@@ -71,12 +56,12 @@ def httpServer(self):
                         encounter["stats"] = stats["pokemon"][encounter["name"]]
                         return jsonify(encounter)
                     except:
-                        abort(503)
+                        self.abort(503)
                 return jsonify(encounter)
-            abort(503)
+            self.abort(503)
 
         @server.route("/encounter_rate", methods=["GET"])
-        def EncounterRate(self):
+        def EncounterRate():
             try:
                 return jsonify({"encounter_rate": self.GetEncounterRate()})
             except:
@@ -84,33 +69,34 @@ def httpServer(self):
             abort(503)
 
         @server.route("/emu", methods=["GET"])
-        def Emu(self):
+        def Emu():
             emu = self.GetEmu()
             if emu:
                 return jsonify(emu)
-            abort(503)
+            self.abort(503)
 
         @server.route("/stats", methods=["GET"])
-        def Stats(self):
+        
+        def Stats():
             stats = self.GetStats()
             if stats:
                 return jsonify(stats)
-            abort(503)
+            self.abort(503)
 
         @server.route("/encounter_log", methods=["GET"])
-        def EncounterLog(self):
+        def EncounterLog():
             recent_encounter_log = self.GetEncounterLog()["encounter_log"][-25:]
             if recent_encounter_log:
                 encounter_log = {"encounter_log": recent_encounter_log}
                 return jsonify(encounter_log)
-            abort(503)
+            self.abort(503)
 
         @server.route("/shiny_log", methods=["GET"])
-        def ShinyLog(self):
-            shiny_log = self.GetShinyLog(self)
+        def ShinyLog():
+            shiny_log = self.GetShinyLog()
             if shiny_log:
                 return jsonify(shiny_log)
-            abort(503)
+            self.abort(503)
 
         # TODO Missing route_list
         # @server.route("/routes", methods=["GET"])
@@ -121,10 +107,10 @@ def httpServer(self):
         #         abort(503)
 
         @server.route("/pokedex", methods=["GET"])
-        def Pokedex(self):
+        def Pokedex():
             if self.PokedexList:
                 return self.PokedexList
-            abort(503)
+            self.abort(503)
 
         # @server.route("/config", methods=["POST"])
         # def Config():
@@ -132,7 +118,7 @@ def httpServer(self):
         #    return response
 
         @server.route("/updateblocklist", methods=["POST"])
-        def UpdateBlockList(self):
+        def UpdateBlockList():
            data = request.json
            pkmName = data.get('pokemonName')
            sprite = data.get('spriteLoaded')
@@ -144,20 +130,21 @@ def httpServer(self):
            return "OK", 200
 
         @server.route("/blocked", methods=["GET"])
-        def Blocked(self):
+        def Blocked():
             block_list = self.GetBlockList()
             return block_list
 
         @server.route("/screenshot.png", methods=["GET"])
-        def Screenshot(self):
+        def Screenshot():
             screenshot = self.GetScreenshot()
             if screenshot.any():
-                buffer = cv2.imencode('.png', screenshot)[1]
+                buffer = self.cv2.imencode('.png', screenshot)[1]
                 response = make_response(buffer.tobytes())
                 response.headers['Content-Type'] = 'image/png'
                 return response
-            abort(503)
+            self.abort(503)
 
         server.run(debug=False, threaded=True, host=self.config["server"]["ip"], port=self.config["server"]["port"])
     except Exception as e:
-        log.debug(str(e))
+        self.logger.error("Hit an error in _flaskServer.py:")
+        self.logger.error(str(e))

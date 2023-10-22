@@ -8,7 +8,7 @@ def GetScreenshot(self):
     while True:
         screenshot = None
         try:
-            screenshot = self.Image.open(io.BytesIO(mmap.mmap(0, 24576, "bizhawk_screenshot-" + self.config["bot_instance_id"])))
+            screenshot = self.Image.open(io.BytesIO(mmap.mmap(0, 24576, "bizhawk_screenshot-" + self.config["profile"])))
             screenshot = cv2.cvtColor(numpy.array(screenshot), cv2.COLOR_BGR2RGB)
             return screenshot
         except Exception as e:

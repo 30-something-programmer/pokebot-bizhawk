@@ -99,9 +99,9 @@ def CustomHooks(self, hook):
                             "Total Encounters": "{:,} ({:,}✨)".format(
                                             stats["totals"].get("encounters", 0),
                                             stats["totals"].get("shiny_encounters", 0))},
-                        embed_thumbnail="./modules/interface/sprites/pokemon/shiny/{}.png".format(
+                        embed_thumbnail=(self.interface_folder+"./modules/interface/sprites/pokemon/shiny/{}.png").format(
                                             pokemon["name"]),
-                        embed_footer=f"PokéBot ID: {self.config['bot_instance_id']}",
+                        embed_footer=f"PokéBot ID: {self.config['profile']}",
                         embed_color="ffd242")
             except Exception as e:
                 self.logger.exception(str(e))
@@ -126,7 +126,7 @@ def CustomHooks(self, hook):
                                         pokemon["name"]),
                         embed_thumbnail="./modules/interface/sprites/pokemon/{}.png".format(
                                         pokemon["name"]),
-                        embed_footer=f"PokéBot ID: {self.config['bot_instance_id']}",
+                        embed_footer=f"PokéBot ID: {self.config['profile']}",
                         embed_color="50C878")
             except Exception as e:
                 self.logger.exception(str(e))
@@ -152,7 +152,7 @@ def CustomHooks(self, hook):
                                             pokemon["name"]),
                         embed_thumbnail="./modules/interface/sprites/pokemon/shiny/{}.png".format(
                                             pokemon["name"]),
-                        embed_footer=f"PokéBot ID: {self.config['bot_instance_id']}",
+                        embed_footer=f"PokéBot ID: {self.config['profile']}",
                         embed_color="ffd242")
             except Exception as e:
                 self.logger.exception(str(e))
@@ -174,7 +174,7 @@ def CustomHooks(self, hook):
                         embed=True,
                         embed_description="{:,} total encounters!".format(
                                           stats["totals"].get("encounters", 0)),
-                        embed_thumbnail="./modules/interface/sprites/items/{}.png".format(
+                        embed_thumbnail=(self.interface_folder+"/sprites/items/{}.png").format(
                             self.random.choice([
                                 "Dive Ball",
                                 "Great Ball",
@@ -190,7 +190,7 @@ def CustomHooks(self, hook):
                                 "Smoke Ball",
                                 "Timer Ball",
                                 "Ultra Ball"])),
-                        embed_footer=f"PokéBot ID: {self.config['bot_instance_id']}",
+                        embed_footer=f"PokéBot ID: {self.config['profile']}",
                         embed_color="50C878")
             except Exception as e:
                 self.logger.exception(str(e))
@@ -235,7 +235,7 @@ def CustomHooks(self, hook):
                             "Total Encounters": "{:,} ({:,}✨)".format(
                                                     stats["totals"].get("encounters", 0),
                                                     stats["totals"].get("shiny_encounters", 0))},
-                        embed_footer=f"PokéBot ID: {self.config['bot_instance_id']}",
+                        embed_footer=f"PokéBot ID: {self.config['profile']}",
                         embed_color="D70040")
             except Exception as e:
                 self.logger.exception(str(e))

@@ -1,6 +1,6 @@
 # A method of class Bot - derived from __init__
 
-# Check your recent encounters .csv files in the stats/encounters/
+# Check your recent encounters .csv files in the stats_folder/encounters/
 # folder to see all available Pokémon fields to filter on
 # return True to command the bot to catch the Pokémon
 # TODO add option for a Discord webhook when a custom is caught

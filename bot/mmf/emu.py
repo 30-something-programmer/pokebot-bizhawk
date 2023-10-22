@@ -35,7 +35,7 @@ def clamp(n, minn, maxn):
 def GetEmu(self):
     while True:
         try:
-            emu = self.LoadJsonMmap(4096, "bizhawk_emu_data-" + self.config["bot_instance_id"])["emu"]
+            emu = self.LoadJsonMmap(4096, "bizhawk_emu_data-" + self.config["profile"])["emu"]
             if self.EmuValidator(emu):
                 emu["speed"] = clamp(emu["fps"] / 60, 0.06, 1000)
                 emu["language"] = LangISO(emu["language"])

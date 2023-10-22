@@ -14,7 +14,7 @@ bag_schema = {
 def GetBag(self):
     while True:
         try:
-            bag = self.LoadJsonMmap(8192, "bizhawk_bag_data-" + self.config["bot_instance_id"])["bag"]
+            bag = self.LoadJsonMmap(8192, "bizhawk_bag_data-" + self.config["profile"])["bag"]
             self.logger.info("bag.py -- GetBag() Pulled bag")
             return bag # Validator throws an exception: Data must be object
             # if BagValidator(bag):

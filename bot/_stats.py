@@ -1,28 +1,11 @@
-import copy
-import os
-import json
-import math
-import time
-import pandas as pd
-import pydirectinput
-from threading import Thread
-from datetime import datetime
-
-
 
 session_encounters = 0
-files = {
-    "encounter_log": "stats/encounter_log.json",
-    "shiny_log": "stats/shiny_log.json",
-    "totals": "stats/totals.json"
-}
-
 
 def GetStats(self):
     try:
-        totals = self.ReadFile(files["totals"])
+        totals = self.ReadFile(self.files["totals"])
         if totals:
-            return json.loads(totals)
+            return self.json.loads(totals)
         return None
     except Exception as e:
         self.logger.exception(str(e))
@@ -32,9 +15,9 @@ def GetStats(self):
 def GetEncounterLog(self):
     default = {"encounter_log": []}
     try:
-        encounter_log = self.ReadFile(files["encounter_log"])
+        encounter_log = self.ReadFile(self.files["encounter_log"])
         if encounter_log:
-            return json.loads(encounter_log)
+            return self.json.loads(encounter_log)
         return default
     except Exception as e:
         self.logger.exception(str(e))
@@ -44,9 +27,9 @@ def GetEncounterLog(self):
 def GetShinyLog(self):
     default = {"shiny_log": []}
     try:
-        shiny_log = self.ReadFile(files["shiny_log"])
+        shiny_log = self.ReadFile(self.files["shiny_log"])
         if shiny_log:
-            return json.loads(shiny_log)
+            return self.json.loads(shiny_log)
         return default
     except Exception as e:
         self.logger.exception(str(e))
@@ -57,7 +40,7 @@ def GetRNGState(self, tid: str, mon: str):
     default = {"rngState": []}
     try:
         file = self.ReadFile(f"stats/{tid}/{mon.lower()}.json")
-        data = json.loads(file) if file else default
+        data = self.json.loads(file) if file else default
         return data
     except Exception as e:
         self.logger.exception(str(e))
@@ -67,13 +50,13 @@ def GetRNGState(self, tid: str, mon: str):
 def GetEncounterRate(self):
     try:
         fmt = "%Y-%m-%d %H:%M:%S.%f"
-        encounter_logs = GetEncounterLog()["encounter_log"]
-        if len(encounter_logs) > 1 and session_encounters > 1:
+        encounter_logs = GetEncounterLog(self)["encounter_log"]
+        if len(encounter_logs) > 1 and self.session_encounters > 1:
             encounter_rate = int(
                 (3600 /
-                 (datetime.strptime(encounter_logs[-1]["time_encountered"], fmt) -
-                  datetime.strptime(encounter_logs[-min(session_encounters, 250)]["time_encountered"], fmt)
-                  ).total_seconds()) * (min(session_encounters, 250)))
+                 (self.datetime.strptime(encounter_logs[-1]["time_encountered"], fmt) -
+                  self.datetime.strptime(encounter_logs[-min(self.session_encounters, 250)]["time_encountered"], fmt)
+                  ).total_seconds()) * (min(self.session_encounters, 250)))
             return encounter_rate
         return 0
     except Exception as e:
@@ -114,7 +97,6 @@ def OpponentChanged(self):
 
 
 def LogEncounter(self, pokemon: dict):
-    global session_encounters
 
     try:
         # Load stats from totals.json file
@@ -138,8 +120,8 @@ def LogEncounter(self, pokemon: dict):
         # Update Pokémon stats
         stats["pokemon"][pokemon["name"]]["encounters"] = stats["pokemon"][pokemon["name"]].get("encounters", 0) + 1
         stats["pokemon"][pokemon["name"]]["phase_encounters"] = stats["pokemon"][pokemon["name"]].get("phase_encounters", 0) + 1
-        stats["pokemon"][pokemon["name"]]["last_encounter_time_unix"] = time.time()
-        stats["pokemon"][pokemon["name"]]["last_encounter_time_str"] = str(datetime.now())
+        stats["pokemon"][pokemon["name"]]["last_encounter_time_unix"] = self.time.time()
+        stats["pokemon"][pokemon["name"]]["last_encounter_time_str"] = str(self.datetime.now())
 
         # Pokémon phase highest shiny value
         if not stats["pokemon"][pokemon["name"]].get("phase_highest_sv", None):
@@ -211,30 +193,30 @@ def LogEncounter(self, pokemon: dict):
             stats["totals"]["lowest_iv_sum"] = pokemon["IVSum"]
             stats["totals"]["lowest_iv_sum_pokemon"] = pokemon["name"]
 
-        if self.self.config["log"]:
+        if self.config["log"]:
             # Log all encounters to a CSV file per phase
-            csvpath = "stats/encounters/"
+            csvpath = self.stats_folder + "/encounters/"
             csvfile = "Phase {} Encounters.csv".format(stats["totals"].get("shiny_encounters", 0))
-            pokemondata = pd.DataFrame.from_dict(pokemon, orient="index").drop(["enrichedMoves", "moves", "pp", "type"]).sort_index().transpose()
-            os.makedirs(csvpath, exist_ok=True)
-            header = False if os.path.exists(f"{csvpath}{csvfile}") else True
+            pokemondata = self.pd.DataFrame.from_dict(pokemon, orient="index").drop(["enrichedMoves", "moves", "pp", "type"]).sort_index().transpose()
+            self.os.makedirs(csvpath, exist_ok=True)
+            header = False if self.os.path.exists(f"{csvpath}{csvfile}") else True
             pokemondata.to_csv(f"{csvpath}{csvfile}", mode="a", encoding="utf-8", index=False, header=header)
 
-        encounter_log = GetEncounterLog()
+        encounter_log = GetEncounterLog(self)
 
         # Pokémon shiny average
         if stats["pokemon"][pokemon["name"]].get("shiny_encounters"):
-            avg = int(math.floor(stats["pokemon"][pokemon["name"]]["encounters"] / stats["pokemon"][pokemon["name"]]["shiny_encounters"]))
+            avg = int(self.math.floor(stats["pokemon"][pokemon["name"]]["encounters"] / stats["pokemon"][pokemon["name"]]["shiny_encounters"]))
             stats["pokemon"][pokemon["name"]]["shiny_average"] = f"1/{avg:,}"
 
         # Total shiny average
         if stats["totals"].get("shiny_encounters"):
-            avg = int(math.floor(stats["totals"]["encounters"] / stats["totals"]["shiny_encounters"]))
+            avg = int(self.math.floor(stats["totals"]["encounters"] / stats["totals"]["shiny_encounters"]))
             stats["totals"]["shiny_average"] = f"1/{avg:,}"
 
         # Log encounter to encounter_log
         log_obj = {
-            "time_encountered": str(datetime.now()),
+            "time_encountered": str(self.datetime.now()),
             "pokemon_obj": pokemon,
             "snapshot_stats": {
                 "phase_encounters": stats["totals"]["phase_encounters"],
@@ -246,11 +228,11 @@ def LogEncounter(self, pokemon: dict):
         }
         encounter_log["encounter_log"].append(log_obj)
         encounter_log["encounter_log"] = encounter_log["encounter_log"][-250:]
-        self.WriteFile(files["encounter_log"], json.dumps(encounter_log, indent=4, sort_keys=True))
+        self.WriteFile(self.files["encounter_log"], self.json.dumps(encounter_log, indent=4, sort_keys=True))
         if pokemon["shiny"]:
             shiny_log = GetShinyLog()
             shiny_log["shiny_log"].append(log_obj)
-            self.WriteFile(files["shiny_log"], json.dumps(shiny_log, indent=4, sort_keys=True))
+            self.WriteFile(self.files["shiny_log"], self.json.dumps(shiny_log, indent=4, sort_keys=True))
 
         # Same Pokémon encounter streak records
         if len(encounter_log["encounter_log"]) > 1 and encounter_log["encounter_log"][-2]["pokemon_obj"]["name"] == pokemon["name"]:
@@ -303,7 +285,7 @@ def LogEncounter(self, pokemon: dict):
         self.logger.info(f"--------------------------------------------------")
 
         if pokemon["shiny"]:
-            time.sleep(self.config["misc"].get("shiny_delay", 0))
+            self.time.sleep(self.config["misc"].get("shiny_delay", 0))
         if self.config["misc"]["obs"].get("enable_screenshot", None) and \
         pokemon["shiny"]:
             # Throw out Pokemon for screenshot
@@ -311,13 +293,13 @@ def LogEncounter(self, pokemon: dict):
                 self.PressButton("B")
             self.WaitFrames(180)
             for key in self.config["misc"]["obs"]["hotkey_screenshot"]:
-                pydirectinput.keyDown(key)
+                self.pydirectinput.keyDown(key)
             for key in reversed(self.config["misc"]["obs"]["hotkey_screenshot"]):
-                pydirectinput.keyUp(key)
+                self.pydirectinput.keyUp(key)
 
         # Run custom code in CustomHooks in a thread
-        hook = (copy.deepcopy(pokemon), copy.deepcopy(stats))
-        Thread(target=self.CustomHooks, args=(hook,)).start()
+        hook = (self.copy.deepcopy(pokemon), self.copy.deepcopy(stats))
+        self.Thread(target=self.CustomHooks, args=(hook,)).start()
 
         if pokemon["shiny"]:
             # Total longest phase
@@ -354,14 +336,14 @@ def LogEncounter(self, pokemon: dict):
                 stats["pokemon"][pokemon["name"]].pop("phase_lowest_iv_sum", None)
 
         # Save stats file
-        self.WriteFile(files["totals"], json.dumps(stats, indent=4, sort_keys=True))
-        session_encounters += 1
+        self.WriteFile(self.files["totals"], self.json.dumps(stats, indent=4, sort_keys=True))
+        self.session_encounters += 1
 
         # Backup stats folder every n encounters
         if self.config["backup_stats"] > 0 and \
         stats["totals"].get("encounters", None) and \
         stats["totals"]["encounters"] % self.config["backup_stats"] == 0:
-            self.BackupFolder("./stats/", "./backups/stats-{}.zip".format(time.strftime("%Y%m%d-%H%M%S")))
+            self.BackupFolder(self.stats_folder, "./backups/stats-{}.zip".format(self.time.strftime("%Y%m%d-%H%M%S")))
 
     except Exception as e:
         self.logger.exception(str(e))
@@ -380,14 +362,16 @@ def EncounterPokemon(self, starter: bool = False):
     self.logger.info("Identifying Pokemon...")
     self.ReleaseAllInputs()
 
+    # Wait 30 seconds upon an encounter before checking the party (i.e. starter) pokemon stats are
     if starter:
         self.WaitFrames(30)
-
+        pokemon = self.GetParty()[0]
+    else:
+        pokemon = self.GetOpponent()
     if self.GetTrainer()["state"] == self.GameState.OVERWORLD:
         return False
 
-    pokemon = self.GetParty()[0] if starter else self.GetOpponent()
-    LogEncounter(pokemon)
+    self.LogEncounter(pokemon)
 
     replace_battler = False
 
@@ -473,7 +457,7 @@ def EncounterPokemon(self, starter: bool = False):
 
                 if highest_pp == 0:
                     self.logger.info("Ran out of Pokemon to battle with. Ending the script!")
-                    os._exit(1)
+                    self.os._exit(1)
 
                 lead = self.GetParty()[lead_idx]
                 if lead is not None:

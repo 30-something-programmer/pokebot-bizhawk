@@ -214,8 +214,8 @@ def EnrichMonData(self, pokemon: dict):
 def GetOpponent(self):
     while True:
         try:
-            opponent = self.LoadJsonMmap(4096, "bizhawk_opponent_data-" + self.config["bot_instance_id"])["opponent"]
-            if opponent and self.PokemonValidator(opponent):
+            opponent = self.LoadJsonMmap(4096, "bizhawk_opponent_data-" + self.config["profile"])["opponent"]
+            if opponent and self.pokemonValidator(opponent):
                 enriched = EnrichMonData(opponent)
                 if enriched:
                     return enriched
@@ -228,11 +228,11 @@ def GetParty(self):
     while True:
         try:
             party_list = []
-            party = self.LoadJsonMmap(8192, "bizhawk_party_data-" + self.config["bot_instance_id"])["party"]
+            party = self.LoadJsonMmap(8192, "bizhawk_party_data-" + self.config["profile"])["party"]
             if party:
                 for pokemon in party:
-                    if self.PokemonValidator(pokemon):
-                        enriched = EnrichMonData(pokemon)
+                    if self.pokemonValidator(pokemon):
+                        enriched = EnrichMonData(self, pokemon)
                         if enriched:
                             party_list.append(enriched)
                             continue
@@ -242,5 +242,5 @@ def GetParty(self):
                         break
                 return party_list
         except Exception as e:
-            self.logger.debug("Failed to GetParty(), trying again...")
-            self.logger.debug(str(e))
+            self.logger.error("Failed to GetParty(), trying again...")
+            self.logger.error(str(e))

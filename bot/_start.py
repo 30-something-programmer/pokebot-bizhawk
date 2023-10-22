@@ -1,6 +1,3 @@
-import os,json
-from threading import Thread
-
 def Start(self):
 
     def MainLoop(self):
@@ -81,18 +78,18 @@ def Start(self):
                 self.logger.exception(str(e))
 
     try:
-        main = Thread(target=MainLoop,args=[self])
+        main = self.Thread(target=MainLoop,args=[self])
         main.start()
 
         # Discord 
         if self.config["discord"]["rich_presence"]:
-            from _discord import DiscordRichPresence
-            Thread(target=DiscordRichPresence,args=[self]).start()
+            from ._discord import DiscordRichPresence
+            self.Thread(target=DiscordRichPresence,args=[self]).start()
 
         # Http Server
         if self.config["server"]["enable"]:
-            from _flaskServer import httpServer
-            Thread(target=httpServer(self),args=[self]).start()
+            from ._flaskServer import httpServer
+            self.Thread(target=httpServer,args=[self]).start()
 
         # User Interface
         if self.config["ui"]["enable"]:
@@ -100,7 +97,7 @@ def Start(self):
             def OnWindowClose():
                 self.ReleaseAllInputs()
                 self.logger.info("Dashboard closed on user input...")
-                os._exit(1)
+                self.os._exit(1)
 
             url = f"http://{self.config['server']['ip']}:{self.config['server']['port']}/dashboard"
             window = webview.create_window("PokeBot", url=url, width=self.config["ui"]["width"], height=self.config["ui"]["height"],
@@ -111,8 +108,9 @@ def Start(self):
             main.join()
 
     except Exception as e:
+        self.logger.error("Hit an error in _start.py:")
         self.logger.exception(str(e))
-        os._exit(1)
+        self.os._exit(1)
 
     # Stop the loop before it starts if the bot is already running
     if self.isRunning:

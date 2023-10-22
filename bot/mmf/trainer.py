@@ -18,11 +18,11 @@ def GetTrainer(self):
     while True:
         try:
             
-            trainer = self.LoadJsonMmap(4096, "bizhawk_trainer_data-" + self.config["bot_instance_id"])["trainer"]
-            self.logger.info("Loading trainer info - " + self.config["bot_instance_id"])
+            trainer = self.LoadJsonMmap(4096, "bizhawk_trainer_data-" + self.config["profile"])["trainer"]
+            self.logger.debug("Loading trainer info - " + self.config["profile"])
             
             if self.TrainerValidator(trainer):
                 return trainer
         except Exception as e:
-            self.logger.info("Failed to GetTrainer(), trying again...")
-            self.logger.info(str(e))
+            self.logger.error("Failed to GetTrainer(), trying again...")
+            self.logger.error(str(e))

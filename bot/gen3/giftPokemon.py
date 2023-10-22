@@ -29,7 +29,7 @@ def CollectGiftMon(self, target: str):
             self.WaitFrames(5)
 
         rng_frames["rngState"].append(emu["rngState"])
-        self.WriteFile(f"stats/{self.GetTrainer()['tid']}/{target.lower()}.json",
+        self.WriteFile(f"{self.stats_folder}/{self.GetTrainer()['tid']}/{target.lower()}.json",
                   json.dumps(rng_frames, indent=4, sort_keys=True))
 
         mon = self.GetParty()[party_size]

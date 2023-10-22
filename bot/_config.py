@@ -1,8 +1,5 @@
 # A method of class Bot - derived from __init__
 # This method retrieves a config
-import fastjsonschema, os, sys
-
-
 config_schema = {
     "type": "object",
     "properties": {
@@ -77,7 +74,7 @@ config_schema = {
         "pickup": {"type": "boolean"},
         "pickup_threshold": {"type": "number"},
         "log": {"type": "boolean"},
-        "bot_instance_id": {"type": "string"},
+        "profile": {"type": "string"},
         "banned_moves": {"type": "array"},
         "mem_hacks": {"type": "boolean"},
         "auto_stop": {"type": "boolean"}
@@ -86,25 +83,24 @@ config_schema = {
   # Validate the config file to ensure user didn't do a dumb
 
 def GetConfig(self, file):
-    self.logger.info("retrieving config from " + file)
-    if os.path.exists(file):
+    self.logger.info("retreiving config from " + file)
+    if self.os.path.exists(file):
         with open(file, mode="r", encoding="utf-8") as f:
             yaml = self.YAML()
             yaml.default_flow_style = False
             config = yaml.load(f)
-            ConfigValidator = fastjsonschema.compile(config_schema)
+            ConfigValidator = self.fastjsonschema.compile(config_schema)
             
-
             try:
                 ConfigValidator(config)
                 config["bot_mode"] = config["bot_mode"].lower()
                 self.logger.info("Config is valid!")
                 return config
-            except fastjsonschema.exceptions.JsonSchemaDefinitionException as e:
+            except self.fastjsonschema.exceptions.JsonSchemaDefinitionException as e:
                 self.logger.error(str(e))
                 self.logger.error("Config is invalid!")
                 return None
     else:
         self.logger.error("Config file not found!")
-        sys.exit("config file missing")
+        self.sys.exit("config file missing")
         
